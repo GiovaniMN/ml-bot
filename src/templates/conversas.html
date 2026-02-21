@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Jupiter_eletro — Conversas</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .header {
+            background: #FFE600; padding: 16px 24px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 2px solid #ccc;
+        }
+        .header h1 { font-size: 20px; color: #333; }
+        .nav { display: flex; gap: 16px; margin-left: auto; }
+        .nav a { text-decoration: none; color: #333; font-weight: bold; font-size: 14px; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #333; }
+        .conversa {
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px; border: 1px solid #eee;
+            border-radius: 6px; margin-bottom: 10px;
+        }
+        .conversa .info { flex: 1; }
+        .conversa .info .titulo { font-size: 14px; font-weight: bold; }
+        .conversa .info .sub { font-size: 12px; color: #666; margin-top: 4px; }
+        .badge-aguardando { background: #fff3cd; color: #856404; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; }
+        .btn-liberar { background: #e6f9ee; color: #2d7a4f; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .btn-liberar:hover { background: #a8e6c0; }
+        .vazio { text-align: center; color: #999; padding: 32px; font-size: 14px; }
+        .atualizar { font-size: 12px; color: #999; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <span style="font-size: 24px;">🤖</span>
+    <h1>Jupiter_eletro — Conversas Aguardando</h1>
+    <div class="nav">
+        <a href="/painel">📢 Promoções</a>
+        <a href="/painel/faq">❓ FAQ</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2>💬 Conversas aguardando atendimento humano
+            {% if conversas %}
+            <span style="background:#FFE600;font-size:11px;padding:2px 8px;border-radius:12px;margin-left:8px;">{{ conversas|length }}</span>
+            {% endif %}
+        </h2>
+        <p class="atualizar">Atualize a página para ver o status mais recente.</p>
+
+        {% if conversas %}
+            {% for c in conversas %}
+            <div class="conversa">
+                <div class="info">
+                    <div class="titulo">Comprador #{{ c.buyer_id }}</div>
+                    <div class="sub">ID da conversa: {{ c.conversa_id }}</div>
+                </div>
+                <span class="badge-aguardando">⏳ Aguardando</span>
+                <form method="POST" action="/painel/conversas/liberar">
+                    <input type="hidden" name="conversa_id" value="{{ c.conversa_id }}">
+                    <button type="submit" class="btn-liberar">✅ Liberar bot</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="vazio">
+            ✅ Nenhuma conversa aguardando atendimento humano no momento.
+        </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

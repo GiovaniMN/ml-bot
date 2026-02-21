@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Jupiter_eletro — FAQ</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .header {
+            background: #FFE600;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #ccc;
+        }
+        .header h1 { font-size: 20px; color: #333; }
+        .nav { display: flex; gap: 16px; margin-left: auto; }
+        .nav a { text-decoration: none; color: #333; font-weight: bold; font-size: 14px; }
+        .nav a:hover { text-decoration: underline; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #333; }
+        input[type="text"], textarea {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; font-family: Arial, sans-serif;
+            margin-bottom: 10px;
+        }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: #FFE600; }
+        textarea { height: 80px; resize: vertical; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-add { background: #FFE600; color: #333; width: 100%; padding: 12px; }
+        .btn-add:hover { background: #f0d800; }
+        .btn-del { background: #fdecea; color: #c0392b; font-size: 12px; padding: 6px 12px; }
+        .btn-del:hover { background: #f5a9a9; }
+        .faq-item { border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+        .faq-item .palavras { font-size: 12px; color: #666; margin-bottom: 6px; }
+        .faq-item .palavras span {
+            background: #f0f0f0; padding: 2px 8px;
+            border-radius: 12px; margin-right: 4px; display: inline-block; margin-bottom: 4px;
+        }
+        .faq-item .resposta { font-size: 14px; color: #333; margin-bottom: 10px; }
+        .faq-item .acoes { display: flex; justify-content: flex-end; }
+        .alerta { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+        .alerta.sucesso { background: #e6f9ee; color: #2d7a4f; border: 1px solid #a8e6c0; }
+        .alerta.erro { background: #fdecea; color: #c0392b; border: 1px solid #f5a9a9; }
+        .vazio { text-align: center; color: #999; padding: 24px; font-size: 14px; }
+        .dica { font-size: 12px; color: #999; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <span style="font-size: 24px;">🤖</span>
+    <h1>Jupiter_eletro — Gerenciar FAQ</h1>
+    <div class="nav">
+        <a href="/painel">📢 Promoções</a>
+        <a href="/painel/conversas">💬 Conversas</a>
+    </div>
+</div>
+
+<div class="container">
+    {% if mensagem_sucesso %}
+    <div class="alerta sucesso">✅ {{ mensagem_sucesso }}</div>
+    {% endif %}
+    {% if mensagem_erro %}
+    <div class="alerta erro">❌ {{ mensagem_erro }}</div>
+    {% endif %}
+
+    <div class="card">
+        <h2>➕ Adicionar nova pergunta</h2>
+        <form method="POST" action="/painel/faq/adicionar">
+            <p class="dica">Palavras-chave (separe por vírgula): ex: garantia, defeito, quebrou</p>
+            <input type="text" name="perguntas" placeholder="garantia, defeito, quebrou, problema" required>
+            <p class="dica">Resposta que o bot vai enviar:</p>
+            <textarea name="resposta" placeholder="🛡️ Todos os produtos possuem garantia de fábrica..." required></textarea>
+            <button type="submit" class="btn btn-add">➕ Adicionar ao FAQ</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>📋 Perguntas cadastradas ({{ itens|length }})</h2>
+        {% if itens %}
+            {% for item in itens %}
+            <div class="faq-item">
+                <div class="palavras">
+                    {% for p in item.perguntas %}
+                    <span>{{ p }}</span>
+                    {% endfor %}
+                </div>
+                <div class="resposta">{{ item.resposta }}</div>
+                <div class="acoes">
+                    <form method="POST" action="/painel/faq/remover">
+                        <input type="hidden" name="id" value="{{ item.id }}">
+                        <button type="submit" class="btn btn-del" onclick="return confirm('Remover esta pergunta?')">🗑️ Remover</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="vazio">Nenhuma pergunta cadastrada ainda.</div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
