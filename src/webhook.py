@@ -7,7 +7,7 @@ from slowapi.util import get_remote_address
 from fastapi import APIRouter, Request
 from src.bot import processar_mensagem
 from src.ml_api import enviar_mensagem, buscar_pergunta, responder_pergunta
-from src.sessoes import esta_aguardando_humano, liberar_sessao
+from src.db_sessoes import esta_aguardando_humano, liberar_sessao
 from src.ml_api_pedidos import buscar_pedido, buscar_rastreio, enviar_mensagem_pedido
 from src.mensagens_pedido import (
     mensagem_pagamento_confirmado,

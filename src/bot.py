@@ -1,6 +1,6 @@
-from src.faq import buscar_faq
+from src.db_faq import buscar_resposta_faq
+from src.db_sessoes import set_estado
 from src.ml_api import buscar_pedidos_do_comprador
-from src.sessoes import set_estado
 from src.notificacao import notificar_vendedor
 
 MENU_PRINCIPAL = """👋 Olá! Bem-vindo à *Jupiter_eletro*!
@@ -110,12 +110,12 @@ async def processar_mensagem(texto: str, conversa_id: str, buyer_id: str):
             return "🔍 Para consultar seu pedido acesse:\n*Mercado Livre → Minhas compras*"
 
     elif intencao == "transferir":
-        set_estado(conversa_id, "aguardando_humano")
+        await set_estado(conversa_id, "aguardando_humano", buyer_id)
         await notificar_vendedor(buyer_id, conversa_id, texto)
         return MENSAGEM_TRANSFERENCIA
 
     elif intencao == "faq":
-        resposta_faq = buscar_faq(texto)
+        resposta_faq = await buscar_resposta_faq(texto)
         if resposta_faq:
             return resposta_faq
         else:
