@@ -24,6 +24,7 @@ packaging==26.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 python-dotenv==1.2.1
+python-json-logger==4.0.0
 python-multipart==0.0.22
 slowapi==0.1.9
 SQLAlchemy==2.0.46
