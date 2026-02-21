@@ -1,4 +1,5 @@
 import os
+import bcrypt
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -12,17 +13,22 @@ templates = Jinja2Templates(directory="src/templates")
 
 SECRET = os.getenv("SESSION_SECRET", "chave-secreta-padrao")
 USUARIO = os.getenv("PAINEL_USUARIO", "admin")
-SENHA = os.getenv("PAINEL_SENHA", "jupiter123")
+SENHA_HASH = os.getenv("PAINEL_SENHA_HASH", "")
 COOKIE_NAME = "painel_session"
 
 serializer = URLSafeTimedSerializer(SECRET)
+
+def verificar_senha(senha_digitada: str) -> bool:
+    if not SENHA_HASH:
+        return False
+    return bcrypt.checkpw(senha_digitada.encode(), SENHA_HASH.encode())
 
 def criar_sessao(usuario: str) -> str:
     return serializer.dumps(usuario)
 
 def verificar_sessao(token: str) -> bool:
     try:
-        serializer.loads(token, max_age=86400)  # 24 horas
+        serializer.loads(token, max_age=86400)
         return True
     except BadSignature:
         return False
@@ -48,13 +54,14 @@ async def login_post(
     usuario: str = Form(...),
     senha: str = Form(...)
 ):
-    if usuario == USUARIO and senha == SENHA:
+    if usuario == USUARIO and verificar_senha(senha):
         token = criar_sessao(usuario)
         response = RedirectResponse("/painel", status_code=302)
         response.set_cookie(
             key=COOKIE_NAME,
             value=token,
             httponly=True,
+            secure=True,       # ← apenas HTTPS
             max_age=86400,
             samesite="lax"
         )

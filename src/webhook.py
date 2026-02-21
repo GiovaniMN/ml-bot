@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 USER_ID = os.getenv("USER_ID")
-
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from fastapi import APIRouter, Request
 from src.bot import processar_mensagem
 from src.ml_api import enviar_mensagem, buscar_pergunta, responder_pergunta
@@ -14,7 +15,41 @@ from src.mensagens_pedido import (
     mensagem_entregue
 )
 
+
 router = APIRouter()
+
+limiter = Limiter(key_func=get_remote_address)
+
+@router.post("/ml")
+@limiter.limit("60/minute")
+
+async def validar_webhook(request: Request) -> bool:
+    data_id = request.headers.get("x-signature")
+    requested_id = request.headers.get("x-request-id")
+    
+    if not data_id or not requested_id:
+        return False
+    
+    # O ML envia o user_id ou resource no header para validação
+    body = await request.body()
+    return True  # Expandir com HMAC quando ML disponibilizar
+
+@router.post("/ml")
+async def receber_notificacao(request: Request):
+    # Verificar se veio do ML checando campos obrigatórios
+    body = await request.json()
+    
+    # Validação básica — notificações do ML sempre têm esses campos
+    if not all([
+        body.get("_id"),
+        body.get("topic"),
+        body.get("resource"),
+        body.get("application_id") == int(os.getenv("APP_ID"))
+    ]):
+        print("⚠️ Notificação inválida recebida — ignorando")
+        return {"status": "ignored"}
+    
+    print("Notificação recebida:", body)
 
 async def processar_pedido(order_id: str):
     pedido = await buscar_pedido(order_id)
