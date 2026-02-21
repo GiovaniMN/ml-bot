@@ -2,6 +2,8 @@ from src.db_faq import buscar_resposta_faq
 from src.db_sessoes import set_estado
 from src.ml_api import buscar_pedidos_do_comprador
 from src.notificacao import notificar_vendedor
+from src.ia_intencao import detectar_intencao_com_fallback
+from src.logger import logger
 
 MENU_PRINCIPAL = """👋 Olá! Bem-vindo à *Jupiter_eletro*!
 
@@ -41,7 +43,7 @@ ENVIO_TRADUCAO = {
     "cancelled": "❌ Cancelado",
 }
 
-def detectar_intencao(texto: str):
+def detectar_intencao(texto: str) -> str:
     texto = texto.lower().strip()
 
     if texto in ["1", "1️⃣"]:
@@ -91,14 +93,26 @@ async def buscar_status_pedido(buyer_id: str):
         )
 
     except Exception as e:
-        print("Erro ao buscar pedido:", e)
+        logger.error("Erro ao buscar pedido", extra={"erro": str(e)})
         return (
             "⚠️ Não consegui buscar seu pedido agora.\n"
             "Acesse *Mercado Livre → Minhas compras* para verificar o status."
         )
 
 async def processar_mensagem(texto: str, conversa_id: str, buyer_id: str):
-    intencao = detectar_intencao(texto)
+
+    # Tenta IA primeiro
+    intencao = await detectar_intencao_com_fallback(texto)
+
+    # Se IA falhar usa palavras-chave
+    if not intencao:
+        intencao = detectar_intencao(texto)
+
+    logger.info("Intenção processada", extra={
+        "intencao": intencao,
+        "conversa_id": conversa_id,
+        "texto": texto[:50]
+    })
 
     if intencao == "saudacao":
         return MENU_PRINCIPAL
