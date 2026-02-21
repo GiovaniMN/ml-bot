@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+USER_ID = os.getenv("USER_ID")
+
 from fastapi import APIRouter, Request
 from src.bot import processar_mensagem
 from src.ml_api import enviar_mensagem, buscar_pergunta, responder_pergunta

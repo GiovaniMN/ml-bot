@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter_eletro — Painel</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+        .header {
+            background: #FFE600;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #ccc;
+        }
+        .header h1 { font-size: 20px; color: #333; }
+
+        .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #333; }
+
+        .compradores { max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
+        .comprador {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .comprador:last-child { border-bottom: none; }
+        .comprador:hover { background: #fafafa; }
+        .comprador input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .comprador .info { flex: 1; }
+        .comprador .produto { color: #666; font-size: 12px; margin-top: 2px; }
+        .comprador .data { color: #999; font-size: 12px; }
+
+        .selecionar-todos {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        textarea:focus { outline: none; border-color: #FFE600; }
+
+        .contador { font-size: 12px; color: #999; margin-top: 6px; }
+
+        .btn-enviar {
+            background: #FFE600;
+            color: #333;
+            border: none;
+            padding: 14px 32px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-enviar:hover { background: #f0d800; }
+        .btn-enviar:disabled { background: #ccc; cursor: not-allowed; }
+
+        .alerta {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .alerta.sucesso { background: #e6f9ee; color: #2d7a4f; border: 1px solid #a8e6c0; display: block; }
+        .alerta.erro { background: #fdecea; color: #c0392b; border: 1px solid #f5a9a9; display: block; }
+
+        .vazio { padding: 24px; text-align: center; color: #999; font-size: 14px; }
+
+        .badge {
+            background: #FFE600;
+            color: #333;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <span style="font-size: 24px;">🤖</span>
+    <h1>Jupiter_eletro — Painel de Promoções</h1>
+</div>
+
+<div class="container">
+
+    {% if mensagem_sucesso %}
+    <div class="alerta sucesso">✅ {{ mensagem_sucesso }}</div>
+    {% endif %}
+
+    {% if mensagem_erro %}
+    <div class="alerta erro">❌ {{ mensagem_erro }}</div>
+    {% endif %}
+
+    <form method="POST" action="/painel/enviar">
+
+        <div class="card">
+            <h2>📋 Compradores dos últimos 90 dias <span class="badge">{{ compradores|length }} encontrados</span></h2>
+
+            {% if compradores %}
+            <label class="selecionar-todos">
+                <input type="checkbox" id="selecionar-todos" onclick="toggleTodos(this)">
+                Selecionar todos
+            </label>
+
+            <div class="compradores">
+                {% for c in compradores %}
+                <div class="comprador">
+                    <input type="checkbox" name="pack_ids" value="{{ c.pack_id }}|{{ c.buyer_id }}" class="check-comprador">
+                    <div class="info">
+                        <div>Comprador #{{ c.buyer_id }}</div>
+                        <div class="produto">{{ c.produto }}</div>
+                    </div>
+                    <div class="data">{{ c.data }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="vazio">Nenhum comprador encontrado nos últimos 90 dias.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>✍️ Mensagem</h2>
+            <textarea name="mensagem" placeholder="Ex: 🎉 Promoção especial Jupiter_eletro! Use o cupom JUPITER10 para 10% de desconto na sua próxima compra. Válido até 28/02!" maxlength="500" oninput="atualizarContador(this)"></textarea>
+            <div class="contador"><span id="contador">0</span>/500 caracteres</div>
+        </div>
+
+        <div class="card">
+            <button type="submit" class="btn-enviar">🚀 Enviar Promoção</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function toggleTodos(el) {
+    document.querySelectorAll('.check-comprador').forEach(c => c.checked = el.checked);
+}
+function atualizarContador(el) {
+    document.getElementById('contador').textContent = el.value.length;
+}
+</script>
+
+</body>
+</html>
