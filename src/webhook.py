@@ -12,6 +12,7 @@ from src.mensagens_pedido import (
 )
 from src.logger import logger
 from src.erros import reportar_erro
+from src.sanitizacao import sanitizar_texto
 
 load_dotenv()
 
@@ -75,6 +76,7 @@ async def receber_notificacao(request: Request):
         topic = body.get("topic")
         logger.info("Notificação recebida", extra={"topic": topic, "resource": body.get("resource")})
 
+        # Perguntas no anúncio (pré-venda)
         if topic == "questions":
             resource = body.get("resource", "")
             question_id = resource.replace("/questions/", "")
@@ -82,7 +84,7 @@ async def receber_notificacao(request: Request):
             pergunta = await buscar_pergunta(question_id)
 
             if pergunta.get("status") == "UNANSWERED":
-                texto = pergunta.get("text", "")
+                texto = sanitizar_texto(pergunta.get("text", ""), limite=500)
                 buyer_id = str(pergunta.get("from", {}).get("id", ""))
                 if texto:
                     resposta = await processar_mensagem(texto, question_id, buyer_id)
@@ -91,6 +93,7 @@ async def receber_notificacao(request: Request):
             else:
                 logger.info("Pergunta já respondida", extra={"question_id": question_id})
 
+        # Chat do pedido (pós-venda)
         elif topic == "messages":
             resource = body.get("resource", "")
             partes = resource.split("/")
@@ -98,7 +101,7 @@ async def receber_notificacao(request: Request):
             if "packs" in partes:
                 pack_id = partes[partes.index("packs") + 1]
                 buyer_id = str(body.get("user_id", ""))
-                texto = body.get("text", "")
+                texto = sanitizar_texto(body.get("text", ""), limite=500)
 
                 if await esta_aguardando_humano(pack_id):
                     logger.info("Conversa aguardando humano", extra={"pack_id": pack_id})
@@ -112,6 +115,7 @@ async def receber_notificacao(request: Request):
                         await enviar_mensagem(pack_id, resposta)
                         logger.info("Mensagem respondida", extra={"pack_id": pack_id})
 
+        # Atualizações de pedido
         elif topic == "orders_v2":
             resource = body.get("resource", "")
             order_id = resource.replace("/orders/", "")

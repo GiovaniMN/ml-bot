@@ -1,0 +1,31 @@
+# Ambiente virtual
+venv/
+
+# Variáveis de ambiente — NUNCA subir para o GitHub
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Backups locais
+backups/
+
+# Scripts utilitários locais
+migrar_faq.py
+gerar_senha.py
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Ngrok
+ngrok.exe
+
+# Logs locais
+*.log
+
+# Arquivos do VS Code
+.vscode/
