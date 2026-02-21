@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Request, Form
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from src.sessoes import sessoes, liberar_sessao
+from src.auth_painel import esta_logado
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")
 
-@router.get("/", response_class=__import__('fastapi').responses.HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 async def conversas_home(request: Request):
+    if not esta_logado(request):
+        return RedirectResponse("/painel/login", status_code=302)
     conversas = [
         {"conversa_id": cid, "buyer_id": cid}
         for cid, estado in sessoes.items()
@@ -19,6 +22,8 @@ async def conversas_home(request: Request):
     })
 
 @router.post("/liberar")
-async def conversa_liberar(conversa_id: str = Form(...)):
+async def conversa_liberar(request: Request, conversa_id: str = Form(...)):
+    if not esta_logado(request):
+        return RedirectResponse("/painel/login", status_code=302)
     liberar_sessao(conversa_id)
     return RedirectResponse("/painel/conversas", status_code=302)
