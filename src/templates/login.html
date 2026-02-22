@@ -1,86 +1,65 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <title>Jupiter_eletro — Login</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 40px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .logo span { font-size: 48px; }
-        .logo h1 { font-size: 18px; color: #333; margin-top: 8px; }
-        .logo p { font-size: 13px; color: #999; margin-top: 4px; }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        input:focus { outline: none; border-color: #FFE600; }
-        .btn-login {
-            background: #FFE600;
-            color: #333;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 4px;
-        }
-        .btn-login:hover { background: #f0d800; }
-        .erro {
-            background: #fdecea;
-            color: #c0392b;
-            border: 1px solid #f5a9a9;
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
-        label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Eletro — Acesso</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
+
 <body>
-<div class="card">
-    <div class="logo">
-        <span>🤖</span>
-        <h1>Jupiter_eletro</h1>
-        <p>Painel de Administração</p>
+    <div class="login-page">
+        <div class="login-panel">
+
+            <div class="login-brand">
+                <div class="login-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                    </svg>
+                </div>
+                <div class="login-title">Jupiter Eletro</div>
+                <div class="login-subtitle">Acesse o painel de gerenciamento</div>
+            </div>
+
+            <div class="login-card">
+                {% if erro %}
+                <div class="alert alert-error" style="margin-bottom: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    {{ erro }}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/painel/login">
+                    <div class="form-group">
+                        <label class="form-label" for="usuario">Usuário</label>
+                        <input class="form-control" type="text" id="usuario" name="usuario" placeholder="admin" required
+                            autofocus>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 22px;">
+                        <label class="form-label" for="senha">Senha</label>
+                        <input class="form-control" type="password" id="senha" name="senha" placeholder="Sua senha"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" style="font-size: 14px; padding: 11px;">
+                        Entrar no painel
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" style="width:14px;height:14px;">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+        </div>
     </div>
-
-    {% if erro %}
-    <div class="erro">❌ {{ erro }}</div>
-    {% endif %}
-
-    <form method="POST" action="/painel/login">
-        <label>Usuário</label>
-        <input type="text" name="usuario" placeholder="admin" required autofocus>
-        <label>Senha</label>
-        <input type="password" name="senha" placeholder="••••••••" required>
-        <button type="submit" class="btn-login">Entrar</button>
-    </form>
-</div>
 </body>
+
 </html>

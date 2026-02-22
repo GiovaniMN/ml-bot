@@ -13,6 +13,9 @@ __pycache__/
 # Backups locais
 backups/
 
+# Bancos de dados locais (SQLite de desenvolvimento)
+*.db
+
 # Scripts utilitários locais
 migrar_faq.py
 gerar_senha.py

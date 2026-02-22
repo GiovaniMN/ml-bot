@@ -13,6 +13,8 @@ from src.painel_conversas import router as conversas_router
 from src.auth_painel import router as auth_painel_router
 from src.logger import logger
 from src.erros import reportar_erro
+from fastapi.staticfiles import StaticFiles
+import os
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -42,6 +44,9 @@ app.include_router(auth_painel_router, prefix="/painel")
 app.include_router(painel_router, prefix="/painel")
 app.include_router(faq_router, prefix="/painel/faq")
 app.include_router(conversas_router, prefix="/painel/conversas")
+
+# Montar diretório de arquivos estáticos (CSS, JS, Imagens)
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 @app.get("/")
 def health_check():

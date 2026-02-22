@@ -1,77 +1,111 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <title>Jupiter_eletro — Conversas</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .header {
-            background: #FFE600; padding: 16px 24px;
-            display: flex; align-items: center; gap: 12px;
-            border-bottom: 2px solid #ccc;
-        }
-        .header h1 { font-size: 20px; color: #333; }
-        .nav { display: flex; gap: 16px; margin-left: auto; }
-        .nav a { text-decoration: none; color: #333; font-weight: bold; font-size: 14px; }
-        .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
-        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-        .card h2 { font-size: 16px; margin-bottom: 16px; color: #333; }
-        .conversa {
-            display: flex; align-items: center; gap: 16px;
-            padding: 14px 16px; border: 1px solid #eee;
-            border-radius: 6px; margin-bottom: 10px;
-        }
-        .conversa .info { flex: 1; }
-        .conversa .info .titulo { font-size: 14px; font-weight: bold; }
-        .conversa .info .sub { font-size: 12px; color: #666; margin-top: 4px; }
-        .badge-aguardando { background: #fff3cd; color: #856404; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; }
-        .btn-liberar { background: #e6f9ee; color: #2d7a4f; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
-        .btn-liberar:hover { background: #a8e6c0; }
-        .vazio { text-align: center; color: #999; padding: 32px; font-size: 14px; }
-        .atualizar { font-size: 12px; color: #999; margin-bottom: 16px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Eletro — Fila de Atendimento</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
+
 <body>
-<div class="header">
-    <span style="font-size: 24px;">🤖</span>
-    <h1>Jupiter_eletro — Conversas Aguardando</h1>
-    <div class="nav">
-        <a href="/painel">📢 Promoções</a>
-        <a href="/painel/faq">❓ FAQ</a>
-        <a href="/painel/logout" style="text-decoration:none;color:#333;font-weight:bold;font-size:14px;">🚪 Sair</a>
-    </div>
-</div>
+    {% set active_page = "queue" %}
+    <div class="layout">
 
-<div class="container">
-    <div class="card">
-        <h2>💬 Conversas aguardando atendimento humano
-            {% if conversas %}
-            <span style="background:#FFE600;font-size:11px;padding:2px 8px;border-radius:12px;margin-left:8px;">{{ conversas|length }}</span>
-            {% endif %}
-        </h2>
-        <p class="atualizar">Atualize a página para ver o status mais recente.</p>
+        {% include "sidebar.html" %}
 
-        {% if conversas %}
-            {% for c in conversas %}
-            <div class="conversa">
-                <div class="info">
-                    <div class="titulo">Comprador #{{ c.buyer_id }}</div>
-                    <div class="sub">ID da conversa: {{ c.conversa_id }}</div>
-                </div>
-                <span class="badge-aguardando">⏳ Aguardando</span>
-                <form method="POST" action="/painel/conversas/liberar">
-                    <input type="hidden" name="conversa_id" value="{{ c.conversa_id }}">
-                    <button type="submit" class="btn-liberar">✅ Liberar bot</button>
-                </form>
+        <main class="main">
+            <div class="page-header">
+                <h1>Fila de Atendimento</h1>
+                <p>Conversas pausadas aguardando intervencao humana. Reative o bot apos atender.</p>
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="vazio">
-            ✅ Nenhuma conversa aguardando atendimento humano no momento.
-        </div>
-        {% endif %}
+
+            <div class="page-body">
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            Conversas em espera
+                        </div>
+                        {% if conversas %}
+                        <span class="badge badge-warning">{{ conversas|length }} aguardando</span>
+                        {% else %}
+                        <span class="badge badge-success">Tudo em dia</span>
+                        {% endif %}
+                    </div>
+
+                    {% if conversas %}
+                    <div class="list-wrap" style="border:none; border-radius:0;">
+                        {% for c in conversas %}
+                        <div class="list-row" style="justify-content: space-between;">
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                <div
+                                    style="width:36px; height:36px; border-radius:50%; background:var(--surface-raised); border:1px solid var(--border-strong); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.75" stroke="currentColor"
+                                        style="width:16px;height:16px;color:var(--text-muted)">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div style="font-weight:600; font-size:13px;">Comprador #{{ c.buyer_id }}</div>
+                                    <div
+                                        style="font-size:12px; color:var(--text-faint); margin-top:2px; font-family: monospace;">
+                                        {{ c.conversa_id }}</div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <span class="badge badge-warning">Em espera</span>
+                                <form method="POST" action="/painel/conversas/liberar">
+                                    <input type="hidden" name="conversa_id" value="{{ c.conversa_id }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.75" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                                        </svg>
+                                        Reativar bot
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% else %}
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                        </svg>
+                        <p>Nenhuma conversa aguardando atendimento.</p>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="alert alert-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                    O bot e reativado automaticamente quando voce responde no chat do Mercado Livre. Atualize a pagina
+                    para ver o status mais recente.
+                </div>
+
+            </div>
+        </main>
+
     </div>
-</div>
 </body>
+
 </html>

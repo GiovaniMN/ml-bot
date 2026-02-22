@@ -1,8 +1,8 @@
-from src.db_faq import buscar_resposta_faq
+from src.db_faq import buscar_resposta_faq, carregar_faq
 from src.db_sessoes import set_estado
 from src.ml_api import buscar_pedidos_do_comprador
 from src.notificacao import notificar_vendedor
-from src.ia_intencao import detectar_intencao_com_fallback
+from src.ia_intencao import detectar_intencao_com_fallback, gerar_resposta_faq_com_fallback
 from src.logger import logger
 
 MENU_PRINCIPAL = """👋 Olá! Bem-vindo à *Jupiter_eletro*!
@@ -129,10 +129,30 @@ async def processar_mensagem(texto: str, conversa_id: str, buyer_id: str):
         return MENSAGEM_TRANSFERENCIA
 
     elif intencao == "faq":
+        # 1) Tenta gerar resposta dinâmica com IA usando toda a Base de Conhecimento
+        itens_faq = await carregar_faq()
+        resposta_ia = await gerar_resposta_faq_com_fallback(texto, itens_faq)
+
+        if resposta_ia:
+            # IA gerou uma resposta satisfatória dentro do escopo
+            return resposta_ia
+
+        # 2) IA sinalizou que o assunto está fora do escopo → escala para humano
+        if itens_faq:  # só escala se temos base de conhecimento carregada e IA estava disponível
+            logger.info("FAQ fora do escopo — escalando para humano", extra={
+                "conversa_id": conversa_id, "texto": texto[:50]
+            })
+            await set_estado(conversa_id, "aguardando_humano", buyer_id)
+            await notificar_vendedor(buyer_id, conversa_id, texto)
+            return (
+                "Sua pergunta vai além do que consigo responder automaticamente. "
+                "Estou transferindo você para nossa equipe de atendimento.\n\n"
+                + MENSAGEM_TRANSFERENCIA.split("\n\n", 1)[1]  # reusa horário/contato
+            )
+
+        # 3) Fallback: IA indisponível → busca por palavras-chave (comportamento original)
         resposta_faq = await buscar_resposta_faq(texto)
         if resposta_faq:
             return resposta_faq
-        else:
-            return MENU_PRINCIPAL
 
-    return MENU_PRINCIPAL
+        return MENU_PRINCIPAL
