@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model FaqItem {
+  id        Int      @id @default(autoincrement())
+  perguntas String   // JSON string: ["garantia", "defeito"]
+  resposta  String
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@map("faq_items")
+}
+
+model Sessao {
+  conversaId   String   @id @map("conversa_id")
+  estado       String
+  buyerId      String?  @map("buyer_id")
+  atualizadoEm DateTime @default(now()) @map("atualizado_em")
+
+  @@map("sessoes")
+}
+
+model Token {
+  id            Int      @id @default(1)
+  accessToken   String   @map("access_token")
+  refreshToken  String   @map("refresh_token")
+  atualizadoEm DateTime @default(now()) @map("atualizado_em")
+
+  @@map("tokens")
+}

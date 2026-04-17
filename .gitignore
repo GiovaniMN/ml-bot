@@ -1,34 +1,32 @@
-# Ambiente virtual
+# ─── Ambiente Python (legado) ────────────────────────────────────────────────
 venv/
+__pycache__/
+*.py[cod]
+*.pyo
 
-# Variáveis de ambiente — NUNCA subir para o GitHub
+# ─── Node.js / TypeScript ────────────────────────────────────────────────────
+node_modules/
+dist/
+
+# ─── Banco de dados ─────────────────────────────────────────────────────────
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ─── Configuração sigilosa ───────────────────────────────────────────────────
 .env
 
-# Cache do Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Backups locais
+# ─── Arquivos gerados em runtime ────────────────────────────────────────────
 backups/
+logs/
 
-# Bancos de dados locais (SQLite de desenvolvimento)
-*.db
-
-# Scripts utilitários locais
-migrar_faq.py
-gerar_senha.py
-
-# Arquivos do sistema
-.DS_Store
-Thumbs.db
-
-# Ngrok
+# ─── Ferramentas ────────────────────────────────────────────────────────────
 ngrok.exe
+ngrok
 
-# Logs locais
-*.log
-
-# Arquivos do VS Code
+# ─── Editores ────────────────────────────────────────────────────────────────
 .vscode/
+.idea/
+*.swp
+*.swo

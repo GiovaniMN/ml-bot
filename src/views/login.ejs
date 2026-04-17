@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Eletro — Acesso</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-panel">
+
+            <div class="login-brand">
+                <div class="login-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                    </svg>
+                </div>
+                <div class="login-title">Jupiter Eletro</div>
+                <div class="login-subtitle">Acesse o painel de gerenciamento</div>
+            </div>
+
+            <div class="login-card">
+                <% if (erro) { %>
+                <div class="alert alert-error" style="margin-bottom: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    <%= erro %>
+                </div>
+                <% } %>
+
+                <form method="POST" action="/painel/login">
+                    <div class="form-group">
+                        <label class="form-label" for="usuario">Usuário</label>
+                        <input class="form-control" type="text" id="usuario" name="usuario" placeholder="admin" required
+                            autofocus>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 22px;">
+                        <label class="form-label" for="senha">Senha</label>
+                        <input class="form-control" type="password" id="senha" name="senha" placeholder="Sua senha"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" style="font-size: 14px; padding: 11px;">
+                        Entrar no painel
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" style="width:14px;height:14px;">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

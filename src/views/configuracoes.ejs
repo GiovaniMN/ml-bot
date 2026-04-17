@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Eletro — Configurações</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .config-grid { display: grid; gap: 20px; }
+        .section-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: .4px;
+            padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+        }
+        .badge-ok { background: rgba(34,197,94,.15); color: #22c55e; }
+        .badge-missing { background: rgba(251,146,60,.15); color: #fb923c; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+        .dot-ok { background: #22c55e; }
+        .dot-missing { background: #fb923c; box-shadow: 0 0 6px #fb923c88; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 700px) { .field-row { grid-template-columns: 1fr; } }
+
+        .input-reveal { position: relative; }
+        .input-reveal input { padding-right: 42px; }
+        .reveal-btn {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: var(--text-faint);
+            padding: 4px; display: flex; align-items: center;
+        }
+        .reveal-btn:hover { color: var(--text-muted); }
+
+        .token-info {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px; border-radius: var(--radius);
+            background: var(--surface-raised); border: 1px solid var(--border);
+            font-size: 13px; color: var(--text-muted);
+        }
+        .section-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+        .card-section { padding: 20px; }
+        .card-section + .card-section { border-top: 1px solid var(--border); }
+        .section-title {
+            font-size: 13px; font-weight: 600; color: var(--text);
+            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+        }
+        .hint { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; }
+        .btn-renovar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: var(--radius);
+            border: 1px solid var(--border-strong); background: var(--surface-raised);
+            color: var(--text-muted); font-size: 13px; font-weight: 500;
+            cursor: pointer; transition: all .15s;
+        }
+        .btn-renovar:hover { background: var(--surface-hover); color: var(--text); border-color: var(--accent); }
+        .save-bar {
+            position: sticky; bottom: 0; padding: 16px 0 0;
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <%- include('partials/sidebar', { active_page: 'configuracoes' }) %>
+
+        <main class="main">
+            <div class="page-header">
+                <h1>Configurações</h1>
+                <p>Gerencie as credenciais e parâmetros de funcionamento do sistema.</p>
+            </div>
+
+            <div class="page-body">
+
+                <% if (mensagem_sucesso) { %>
+                <div class="alert alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <%= mensagem_sucesso %>
+                </div>
+                <% } %>
+                <% if (mensagem_erro) { %>
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    <%= mensagem_erro %>
+                </div>
+                <% } %>
+
+                <form method="POST" action="/painel/configuracoes" class="config-grid">
+
+                    <!-- ── Mercado Livre ─────────────────────────────────────── -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016c.896 0 1.7-.393 2.25-1.016m-10.5 0a7.5 7.5 0 0 0-3.75 0m3.75 0a7.5 7.5 0 0 1 3.75 0" />
+                                </svg>
+                                Mercado Livre — Aplicação
+                            </div>
+                            <span class="section-badge <%= status.ml ? 'badge-ok' : 'badge-missing' %>">
+                                <span class="dot <%= status.ml ? 'dot-ok' : 'dot-missing' %>"></span>
+                                <%= status.ml ? 'Configurado' : 'Pendente' %>
+                            </span>
+                        </div>
+                        <div class="card-body" style="display:grid;gap:16px;">
+                            <div class="field-row">
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">App ID</label>
+                                    <span class="hint">ID do aplicativo no ML Developers</span>
+                                    <input class="form-control" type="text" name="APP_ID"
+                                        value="<%= valores.APP_ID %>" placeholder="Ex: 6306753289822432" autocomplete="off">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">User ID</label>
+                                    <span class="hint">ID da sua conta de vendedor</span>
+                                    <input class="form-control" type="text" name="USER_ID"
+                                        value="<%= valores.USER_ID %>" placeholder="Ex: 177715100" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Secret Key (Client Secret)</label>
+                                <span class="hint">Deixe em branco para manter o valor atual</span>
+                                <div class="input-reveal">
+                                    <input class="form-control" type="password" name="SECRET_KEY" id="fld-secret"
+                                        placeholder="<%= status.ml ? '● ● ● ● ● ● configurado' : 'Insira o Secret Key' %>" autocomplete="off">
+                                    <button type="button" class="reveal-btn" onclick="toggleReveal('fld-secret', this)" title="Mostrar/ocultar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-seção: Tokens de Acesso -->
+                        <div class="card-section" style="border-top:1px solid var(--border);">
+                            <div class="section-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;color:var(--text-muted)">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 21.75 8.25Z" />
+                                </svg>
+                                Tokens de Acesso OAuth
+                                <span class="section-badge <%= status.token ? 'badge-ok' : 'badge-missing' %>" style="margin-left:auto;">
+                                    <span class="dot <%= status.token ? 'dot-ok' : 'dot-missing' %>"></span>
+                                    <%= status.token ? 'Ativo' : 'Não configurado' %>
+                                </span>
+                            </div>
+                            <div style="display:grid;gap:12px;margin-bottom:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">Access Token</label>
+                                    <div class="input-reveal">
+                                        <input class="form-control" type="password" name="ACCESS_TOKEN" id="fld-at"
+                                            placeholder="<%= status.token ? '● ● ● ● ● ● configurado' : 'APP_USR-...' %>" autocomplete="off">
+                                        <button type="button" class="reveal-btn" onclick="toggleReveal('fld-at', this)" title="Mostrar/ocultar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">Refresh Token</label>
+                                    <div class="input-reveal">
+                                        <input class="form-control" type="password" name="REFRESH_TOKEN" id="fld-rt"
+                                            placeholder="<%= status.token ? '● ● ● ● ● ● configurado' : 'TG-...' %>" autocomplete="off">
+                                        <button type="button" class="reveal-btn" onclick="toggleReveal('fld-rt', this)" title="Mostrar/ocultar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botão de renovação de token -->
+                            <div class="token-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;flex-shrink:0;color:var(--text-faint)">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                </svg>
+                                <span>Os tokens expiram periodicamente. Renove automaticamente usando o botão abaixo.</span>
+                                <form method="POST" action="/painel/configuracoes/renovar-token" style="margin-left:auto;flex-shrink:0;">
+                                    <button type="submit" class="btn-renovar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:14px;height:14px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                        </svg>
+                                        Renovar token
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Inteligência Artificial ───────────────────────────── -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                                </svg>
+                                Inteligência Artificial — Gemini
+                            </div>
+                            <span class="section-badge <%= status.ia ? 'badge-ok' : 'badge-missing' %>">
+                                <span class="dot <%= status.ia ? 'dot-ok' : 'dot-missing' %>"></span>
+                                <%= status.ia ? 'Configurado' : 'Pendente' %>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Gemini API Key</label>
+                                <span class="hint">Obtenha em <strong>aistudio.google.com</strong> → Get API Key. Deixe em branco para manter o atual.</span>
+                                <div class="input-reveal">
+                                    <input class="form-control" type="password" name="GEMINI_API_KEY" id="fld-gemini"
+                                        placeholder="<%= status.ia ? '● ● ● ● ● ● configurado' : 'AIzaSy...' %>" autocomplete="off">
+                                    <button type="button" class="reveal-btn" onclick="toggleReveal('fld-gemini', this)" title="Mostrar/ocultar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <% if (!status.ia) { %>
+                            <div class="alert alert-warning" style="margin-top:14px;margin-bottom:0;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                </svg>
+                                Sem API Key, o bot usará apenas busca por palavras-chave — sem respostas inteligentes.
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- ── E-mail ────────────────────────────────────────────── -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                </svg>
+                                Notificações por E-mail
+                            </div>
+                            <span class="section-badge <%= status.email ? 'badge-ok' : 'badge-missing' %>">
+                                <span class="dot <%= status.email ? 'dot-ok' : 'dot-missing' %>"></span>
+                                <%= status.email ? 'Configurado' : 'Opcional' %>
+                            </span>
+                        </div>
+                        <div class="card-body" style="display:grid;gap:16px;">
+                            <span class="hint" style="margin-top:-4px;">Configure para receber alertas quando clientes solicitam atendimento humano. Use uma conta Gmail com senha de app.</span>
+                            <div class="field-row">
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">E-mail remetente</label>
+                                    <span class="hint">Conta Gmail que envia as notificações</span>
+                                    <input class="form-control" type="email" name="EMAIL_REMETENTE"
+                                        value="<%= valores.EMAIL_REMETENTE %>" placeholder="bot@gmail.com">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">E-mail do vendedor</label>
+                                    <span class="hint">Destinatário dos alertas</span>
+                                    <input class="form-control" type="email" name="EMAIL_VENDEDOR"
+                                        value="<%= valores.EMAIL_VENDEDOR %>" placeholder="vendedor@gmail.com">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Senha de app do Gmail</label>
+                                <span class="hint">Em Gmail → Conta → Segurança → Senhas de app. Deixe em branco para manter a atual.</span>
+                                <div class="input-reveal">
+                                    <input class="form-control" type="password" name="EMAIL_SENHA" id="fld-email-senha"
+                                        placeholder="<%= status.email ? '● ● ● ● ● ● configurado' : 'xxxx xxxx xxxx xxxx' %>" autocomplete="off">
+                                    <button type="button" class="reveal-btn" onclick="toggleReveal('fld-email-senha', this)" title="Mostrar/ocultar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Painel ────────────────────────────────────────────── -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                                Acesso ao Painel
+                            </div>
+                            <span class="section-badge <%= status.painel ? 'badge-ok' : 'badge-missing' %>">
+                                <span class="dot <%= status.painel ? 'dot-ok' : 'dot-missing' %>"></span>
+                                <%= status.painel ? 'Configurado' : 'Pendente' %>
+                            </span>
+                        </div>
+                        <div class="card-body" style="display:grid;gap:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Nome de usuário</label>
+                                <input class="form-control" type="text" name="PAINEL_USUARIO"
+                                    value="<%= valores.PAINEL_USUARIO %>" placeholder="admin">
+                            </div>
+                            <hr class="section-divider">
+                            <div class="section-title" style="margin-bottom:0;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:15px;height:15px;color:var(--text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                                Alterar senha
+                            </div>
+                            <span class="hint" style="margin-top:-10px;">Deixe em branco para manter a senha atual. Mínimo 6 caracteres.</span>
+                            <div class="field-row">
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">Nova senha</label>
+                                    <div class="input-reveal">
+                                        <input class="form-control" type="password" name="nova_senha" id="fld-nova-senha"
+                                            placeholder="Nova senha" autocomplete="new-password">
+                                        <button type="button" class="reveal-btn" onclick="toggleReveal('fld-nova-senha', this)" title="Mostrar/ocultar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label">Confirmar nova senha</label>
+                                    <div class="input-reveal">
+                                        <input class="form-control" type="password" name="confirmar_senha" id="fld-conf-senha"
+                                            placeholder="Repita a nova senha" autocomplete="new-password">
+                                        <button type="button" class="reveal-btn" onclick="toggleReveal('fld-conf-senha', this)" title="Mostrar/ocultar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Barra de salvar ────────────────────────────────────── -->
+                    <div class="save-bar">
+                        <div style="font-size:12px;color:var(--text-faint);align-self:center;margin-right:auto;">
+                            Campos em branco mantêm os valores atuais. As alterações são aplicadas imediatamente.
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px;height:15px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            Salvar configurações
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleReveal(id, btn) {
+            const input = document.getElementById(id);
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.title = isPassword ? 'Ocultar' : 'Mostrar';
+        }
+
+        // Destaca o campo confirmação se as senhas não coincidem
+        const novaSenha = document.getElementById('fld-nova-senha');
+        const confSenha = document.getElementById('fld-conf-senha');
+        [novaSenha, confSenha].forEach(el => {
+            el.addEventListener('input', () => {
+                const ok = !novaSenha.value || novaSenha.value === confSenha.value;
+                confSenha.style.borderColor = ok ? '' : 'var(--danger, #ef4444)';
+            });
+        });
+    </script>
+</body>
+
+</html>

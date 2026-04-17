@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Eletro — Base de Conhecimento</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="layout">
+
+        <%- include('partials/sidebar', { active_page: 'faq' }) %>
+
+        <main class="main">
+            <div class="page-header">
+                <h1>Base de Conhecimento</h1>
+                <p>Gerencie as respostas automaticas do bot para perguntas frequentes.</p>
+            </div>
+
+            <div class="page-body">
+
+                <% if (mensagem_sucesso) { %>
+                <div class="alert alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <%= mensagem_sucesso %>
+                </div>
+                <% } %>
+                <% if (mensagem_erro) { %>
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    <%= mensagem_erro %>
+                </div>
+                <% } %>
+
+                <!-- New entry form -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Nova entrada
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/painel/faq/adicionar">
+                            <div class="form-group">
+                                <label class="form-label">Palavras-chave</label>
+                                <span class="form-desc">Separe por virgula. Ex: garantia, defeito, quebrou</span>
+                                <input class="form-control" type="text" name="perguntas"
+                                    placeholder="garantia, defeito, problema" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label">Resposta do bot</label>
+                                <span class="form-desc">Texto exato enviado ao cliente quando a pergunta for
+                                    reconhecida.</span>
+                                <textarea class="form-control" name="resposta"
+                                    placeholder="Todos os produtos possuem garantia de fabrica de..."
+                                    required></textarea>
+                            </div>
+                            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Adicionar entrada
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Entries list -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                            Entradas cadastradas
+                        </div>
+                        <span class="badge badge-muted"><%= itens.length %></span>
+                    </div>
+
+                    <% if (itens.length > 0) { %>
+                    <div class="list-wrap" style="border:none; border-radius:0;">
+                        <% for (const item of itens) { %>
+                        <div style="padding: 18px 20px; border-bottom: 1px solid var(--border);">
+                            <div style="margin-bottom: 10px;">
+                                <% for (const p of item.perguntas) { %>
+                                <span class="tag"><%= p %></span>
+                                <% } %>
+                            </div>
+                            <div
+                                style="font-size: 13.5px; color: var(--text-muted); background: var(--surface-raised); padding: 12px 14px; border-radius: var(--radius); white-space: pre-wrap; line-height: 1.6; margin-bottom: 12px;">
+                                <%= item.resposta %></div>
+                            <div style="display:flex; justify-content:flex-end;">
+                                <form method="POST" action="/painel/faq/remover">
+                                    <input type="hidden" name="id" value="<%= item.id %>">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Remover esta entrada da base de conhecimento?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.75" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                        Remover
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } else { %>
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                        <p>Nenhuma entrada cadastrada. Adicione a primeira acima.</p>
+                    </div>
+                    <% } %>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+</body>
+
+</html>
