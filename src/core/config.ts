@@ -17,6 +17,7 @@ const schema = z.object({
   SESSION_SECRET: z.string().min(16, 'SESSION_SECRET deve ter ao menos 16 caracteres'),
 
   // Banco de dados
+  DB_PROVIDER: z.enum(['sqlite', 'postgresql']).default('sqlite'),
   DATABASE_URL: z.string().default('file:./dev.db'),
 
   // Gemini AI (opcional — degrada graciosamente se ausente)
